@@ -407,6 +407,7 @@ def main():
                 logger.info("  Batch size = %d", args.eval_batch_size)
 
                 #Start Evaling model
+                logger.info("\n Start Evaling model")
                 model.eval()
                 eval_loss,tokens_num = 0,0
                 for batch in eval_dataloader:
@@ -418,7 +419,8 @@ def main():
                                            target_ids=target_ids,target_mask=target_mask)     
                     eval_loss += loss.sum().item()
                     tokens_num += num.sum().item()
-                #Pring loss of dev dataset    
+                #Pring loss of dev dataset   
+                logger.info("\n Pring loss of dev dataset")
                 model.train()
                 eval_loss = eval_loss / tokens_num
                 result = {'eval_ppl': round(np.exp(eval_loss),5),
@@ -429,6 +431,7 @@ def main():
                 logger.info("  "+"*"*20)   
                 
                 #save last checkpoint
+                logger.info("\n save last checkpoint")
                 last_output_dir = os.path.join(args.output_dir, 'checkpoint-last')
                 if not os.path.exists(last_output_dir):
                     os.makedirs(last_output_dir)
@@ -449,6 +452,7 @@ def main():
                             
                             
                 #Calculate bleu  
+                logger.info("\n Calculate bleu")
                 if 'dev_bleu' in dev_dataset:
                     eval_examples,eval_data=dev_dataset['dev_bleu']
                 else:
@@ -461,10 +465,11 @@ def main():
                     dev_dataset['dev_bleu']=eval_examples,eval_data
 
 
-                
+                logger.info("\n Calculate SequentialSampler")
                 eval_sampler = SequentialSampler(eval_data)
                 eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.eval_batch_size)
 
+                logger.info("\n start model.eval()")
                 model.eval() 
                 p=[]
                 for batch in eval_dataloader:
@@ -479,6 +484,7 @@ def main():
                                 t=t[:t.index(0)]
                             text = tokenizer.decode(t,clean_up_tokenization_spaces=False)
                             p.append(text)
+                logger.info("\n start model.train")
                 model.train()
                 predictions=[]
                 accs=[]
