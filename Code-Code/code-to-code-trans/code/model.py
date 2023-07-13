@@ -74,7 +74,7 @@ class Seq2Seq(nn.Module):
         else:
             #Predict 
             preds=[]       
-            zero=torch.cuda.LongTensor(1).fill_(0)     
+            zero=torch.zeros(1).fill_(0).type(torch.LongTensor).to('mps')
             for i in range(source_ids.shape[0]):
                 context=encoder_output[:,i:i+1]
                 context_mask=source_mask[i:i+1,:]
@@ -107,14 +107,14 @@ class Seq2Seq(nn.Module):
 class Beam(object):
     def __init__(self, size,sos,eos):
         self.size = size
-        self.tt = torch.cuda
+        self.tt = torch
         # The score for each translation on the beam.
-        self.scores = self.tt.FloatTensor(size).zero_()
+        self.scores = self.tt.zeros(size).zero_().type(torch.FloatTensor).to('mps')
         # The backpointers at each time-step.
         self.prevKs = []
         # The outputs at each time-step.
-        self.nextYs = [self.tt.LongTensor(size)
-                       .fill_(0)]
+        self.nextYs = [self.tt.zeros(size).type(torch.LongTensor).to('mps')
+                        .fill_(0)]
         self.nextYs[0][0] = sos
         # Has EOS topped the beam yet.
         self._eos = eos
@@ -124,7 +124,7 @@ class Beam(object):
 
     def getCurrentState(self):
         "Get the outputs for the current timestep."
-        batch = self.tt.LongTensor(self.nextYs[-1]).view(-1, 1)
+        batch = self.nextYs[-1].type(torch.LongTensor).view(-1, 1).to('mps')
         return batch
 
     def getCurrentOrigin(self):
