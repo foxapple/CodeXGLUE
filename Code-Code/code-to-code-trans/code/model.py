@@ -73,8 +73,11 @@ class Seq2Seq(nn.Module):
             return outputs
         else:
             #Predict 
-            preds=[]       
-            zero=torch.zeros(1).fill_(0).type(torch.LongTensor).to('mps')
+            preds=[]
+            if torch.backends.mps.is_available():       
+                zero=torch.zeros(1).fill_(0).type(torch.LongTensor).to('mps')
+            else:
+                zero=torch.zeros(1).fill_(0).type(torch.LongTensor).to('cuda')
             for i in range(source_ids.shape[0]):
                 context=encoder_output[:,i:i+1]
                 context_mask=source_mask[i:i+1,:]
@@ -109,12 +112,17 @@ class Beam(object):
         self.size = size
         self.tt = torch
         # The score for each translation on the beam.
-        self.scores = self.tt.zeros(size).zero_().type(torch.FloatTensor).to('mps')
+        if torch.backends.mps.is_available():
+            self.scores = self.tt.zeros(size).zero_().type(torch.FloatTensor).to('mps')
+        else:
+            self.scores = self.tt.zeros(size).zero_().type(torch.FloatTensor).to('cuda')
         # The backpointers at each time-step.
         self.prevKs = []
         # The outputs at each time-step.
-        self.nextYs = [self.tt.zeros(size).type(torch.LongTensor).to('mps')
-                        .fill_(0)]
+        if torch.backends.mps.is_available():
+            self.nextYs = [self.tt.zeros(size).type(torch.LongTensor).to('mps').fill_(0)]
+        else:
+            self.nextYs = [self.tt.zeros(size).type(torch.LongTensor).to('cuda').fill_(0)]
         self.nextYs[0][0] = sos
         # Has EOS topped the beam yet.
         self._eos = eos
@@ -124,7 +132,10 @@ class Beam(object):
 
     def getCurrentState(self):
         "Get the outputs for the current timestep."
-        batch = self.nextYs[-1].type(torch.LongTensor).view(-1, 1).to('mps')
+        if torch.backends.mps.is_available():
+            batch = self.nextYs[-1].type(torch.LongTensor).view(-1, 1).to('mps')
+        else:
+            batch = self.nextYs[-1].type(torch.LongTensor).view(-1, 1).to('cuda')
         return batch
 
     def getCurrentOrigin(self):

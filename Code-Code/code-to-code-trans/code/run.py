@@ -262,17 +262,18 @@ def main():
     args = parser.parse_args()
     logger.info(args)
 
-    # # Setup CUDA, GPU & distributed training
-    # if args.local_rank == -1 or args.no_cuda:
-    #     device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
-    #     args.n_gpu = torch.cuda.device_count()
-    # else:  # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
-    #     torch.cuda.set_device(args.local_rank)
-    #     device = torch.device("cuda", args.local_rank)
-    #     torch.distributed.init_process_group(backend='nccl')
-    #     args.n_gpu = 1
-    device = torch.device("mps")
-    args.n_gpu = 1
+    # Setup CUDA, GPU & distributed training
+    if torch.backends.mps.is_available():
+        device = torch.device("mps")
+        args.n_gpu = 1
+    elif args.local_rank == -1 or args.no_cuda:
+        device = torch.device("cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu")
+        args.n_gpu = torch.cuda.device_count()
+    else:  # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
+        torch.cuda.set_device(args.local_rank)
+        device = torch.device("cuda", args.local_rank)
+        torch.distributed.init_process_group(backend='nccl')
+        args.n_gpu = 1
     logger.warning("Process rank: %s, device: %s, n_gpu: %s, distributed training: %s",
                     args.local_rank, device, args.n_gpu, bool(args.local_rank != -1))
     args.device = device
