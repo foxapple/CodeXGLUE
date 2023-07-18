@@ -67,7 +67,10 @@ def main():
     config = config_class.from_pretrained('roberta-base')
     tokenizer = tokenizer_class.from_pretrained('roberta-base')
     model = RobertaForMaskedLM.from_pretrained(args.model, from_tf=bool('.ckpt' in args.model), config=config)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if torch.backends.mps.is_available():
+        device = torch.device("mps")
+    else:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
     model.eval()
 
