@@ -136,7 +136,7 @@ LITFILE=../dataset/javaCorpus/literals.json
 OUTPUTDIR=../save/javaCorpus
 PRETRAINDIR=microsoft/CodeGPT-small-java        # microsoft/CodeGPT-small-py for py150
 LOGFILE=completion_javaCorpus.log
-PER_NODE_GPU=YOUR_GPU_NUM       # modify YOUR_GPU_NUM
+PER_NODE_GPU=1       # modify YOUR_GPU_NUM
 
 python -m torch.distributed.launch --nproc_per_node=$PER_NODE_GPU run_lm.py \
         --data_dir=$DATADIR \
