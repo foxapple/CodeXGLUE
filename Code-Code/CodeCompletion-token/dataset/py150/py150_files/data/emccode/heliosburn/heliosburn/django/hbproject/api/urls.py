@@ -1,0 +1,37 @@
+from django.conf.urls import patterns, url
+from api.views import default, user, session, testplan, auth, traffic, rule, testplan_rule, recording, log, proxy, config, qos, serveroverload
+
+urlpatterns = patterns('',
+    url(r'^$', default.index),
+    url(r'^version/{0,1}$', default.version),
+    url(r'^user/{0,1}$', user.rest),
+    url(r'^user/(\w+?)/{0,1}$', user.rest),
+    url(r'^serveroverload/{0,1}$', serveroverload.rest),
+    url(r'^serveroverload/(\w+?)/{0,1}$', serveroverload.rest),
+    url(r'^qos/{0,1}$', qos.rest),
+    url(r'^qos/(\w+?)/{0,1}$', qos.rest),
+    url(r'^session/{0,1}$', session.rest),
+    url(r'^session/(\w+?)/{0,1}$', session.rest),
+    url(r'^session/(\w+?)/start/{0,1}$', session.start),
+    url(r'^session/(\w+?)/stop/{0,1}$', session.stop),
+    url(r'^testplan/{0,1}$', testplan.rest),
+    url(r'^testplan/(\w+?)/{0,1}$', testplan.rest),
+    url(r'^testplan/(?P<testplan_id>\w+?)/rule/{0,1}$', testplan_rule.rest),
+    url(r'^testplan/(?P<testplan_id>\w+?)/rule/(?P<rule_id>\w+?)/{0,1}$', testplan_rule.rest),
+    url(r'^auth/login/{0,1}$', auth.login),
+    url(r'^traffic/{0,1}$', traffic.rest),
+    url(r'^rule/{0,1}$', rule.rest),
+    url(r'^rule/(\w+?)/{0,1}$', rule.rest),
+    url(r'^recording/{0,1}$', recording.rest),
+    url(r'^recording/(?P<recording_id>\w+?)/{0,1}$', recording.rest),
+    url(r'^recording/(?P<recording_id>\w+?)/(?P<get_traffic>traffic)/{0,1}$', recording.rest),
+    url(r'^recording/(?P<recording_id>\w+?)/start/{0,1}$', recording.start),
+    url(r'^recording/(?P<recording_id>\w+?)/stop/{0,1}$', recording.stop),
+    url(r'^log/{0,1}$', log.get),
+    url(r'^log/stats/{0,1}$', log.get_stats),
+    url(r'^proxy/status/{0,1}$', proxy.status),
+    url(r'^proxy/start/{0,1}$', proxy.start),
+    url(r'^proxy/stop/{0,1}$', proxy.stop),
+    url(r'^status/{0,1}$', proxy.status),  # TODO: This should be removed in the future
+    url(r'^config/{0,1}$', config.get),  # TODO: This should be removed in the future
+)
